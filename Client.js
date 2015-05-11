@@ -64,6 +64,9 @@ var EVENTS = [
  *   });
  */
 function Client(options) {
+
+  var redisClient;
+
   EventEmitter.call(this);
 
   options = options || process.env.REDIS_URL || 'tcp://127.0.0.1:6379';
@@ -95,7 +98,11 @@ function Client(options) {
   if (options.returnBuffers)
     options.return_buffers = true;
 
-  var redisClient = redis.createClient(this.port, this.host, options);
+  if (options.client)
+    redisClient = options.client;
+  else
+    redisClient = redis.createClient(this.port, this.host, options);
+  
 
   EVENTS.forEach(function (eventName) {
     redisClient.on(eventName, this.emit.bind(this, eventName));
